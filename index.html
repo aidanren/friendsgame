@@ -47,15 +47,21 @@ tailwind.config = {
   border-radius: 10px;
 }
 
+/* Wrapper ensures horizontal scroll if grid is too wide */
+.episode-grid-wrapper {
+  width: 100%;
+}
+
 /* Episode Grid */
 .episode-grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr); /* 10 seasons horizontally */
-  grid-template-rows: repeat(25, minmax(50px, 1fr)); /* 25 episodes vertically */
+  grid-template-columns: repeat(10, minmax(50px, 1fr));
+  grid-template-rows: repeat(25, minmax(50px, 1fr));
   gap: 6px;
   padding: 6px;
 }
 
+/* Episode cells */
 .episode-cell {
   display: flex;
   align-items: center;
@@ -70,11 +76,10 @@ tailwind.config = {
   transition: all 0.2s;
   word-wrap: break-word;
   white-space: normal;
-  min-width: 60px;
-  min-height: 50px; 
+  min-width: 50px;
+  min-height: 50px;
   font-size: 0.875rem;
 }
-
 
 .episode-cell.correct {
   background-color: #10b981;
@@ -84,6 +89,15 @@ tailwind.config = {
 .episode-cell.incorrect {
   background-color: #ef4444;
   color: white;
+}
+
+/* Smaller screens adjustments */
+@media (max-width: 640px) {
+  .episode-cell {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 0.7rem;
+  }
 }
 </style>
 </head>
@@ -143,8 +157,10 @@ tailwind.config = {
           <h3 class="font-bold uppercase tracking-widest text-sm">Episode Grid</h3>
         </div>
       </header>
-      <div class="p-6 overflow-y-auto custom-scrollbar flex-grow">
-        <div class="episode-grid" id="episodeGrid"></div>
+      <div class="p-4 flex-grow overflow-auto custom-scrollbar">
+        <div class="episode-grid-wrapper overflow-x-auto">
+          <div class="episode-grid" id="episodeGrid"></div>
+        </div>
       </div>
       <footer class="p-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-700 text-center text-[10px] opacity-40 font-bold uppercase tracking-widest">
         Friends Episode Grid
@@ -161,8 +177,9 @@ tailwind.config = {
 </button>
 
 <script>
+// Episodes array (omitted here for brevity, same as your original code)
 const episodes = [
-    { title: "The One Where Monica Gets a Roommate", season: 1, episode: 1 },
+  { title: "The One Where Monica Gets a Roommate", season: 1, episode: 1 },
   { title: "The One with the Sonogram at the End", season: 1, episode: 2 },
   { title: "The One with the Thumb", season: 1, episode: 3 },
   { title: "The One with George Stephanopoulos", season: 1, episode: 4 },
@@ -419,8 +436,8 @@ const feedback = document.getElementById("feedback");
 
 function buildGrid() {
   grid.innerHTML = "";
-  for (let ep = 1; ep <= 25; ep++) {            // Episodes top to bottom
-    for (let season = 1; season <= 10; season++) { // Seasons left to right
+  for (let ep = 1; ep <= 25; ep++) {
+    for (let season = 1; season <= 10; season++) {
       const episodeExists = episodes.some(e => e.season === season && e.episode === ep);
       const cell = document.createElement("div");
       cell.className = "episode-cell";
@@ -434,7 +451,6 @@ function buildGrid() {
     }
   }
 }
-
 
 function updateStats() {
   document.getElementById("score").innerText = correct;
@@ -484,7 +500,6 @@ document.getElementById("submit-btn").onclick = () => {
 
   updateStats();
 
-  // Wait 2 seconds before moving to the next episode
   setTimeout(() => {
     nextEpisode();
   }, 2000);
