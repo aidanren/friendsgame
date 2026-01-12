@@ -99,6 +99,24 @@ tailwind.config = {
     font-size: 0.7rem;
   }
 }
+
+/* Mobile overlay button */
+#mobile-grid-btn {
+  display: none;
+}
+@media (max-width: 800px) {
+  #mobile-grid-btn {
+    display: block;
+  }
+}
+
+/* Mobile overlay styling */
+#grid-overlay {
+  display: none;
+}
+#grid-overlay.active {
+  display: flex;
+}
 </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display transition-colors duration-300">
@@ -167,6 +185,23 @@ tailwind.config = {
       </footer>
     </main>
 
+  </div>
+</div>
+
+<!-- Mobile Grid Button -->
+<button id="mobile-grid-btn" class="fixed bottom-6 left-6 bg-primary text-slate-900 font-bold py-3 px-4 rounded-xl shadow-lg z-50">
+  Show Grid
+</button>
+
+<!-- Overlay -->
+<div id="grid-overlay" class="fixed inset-0 bg-black/80 hidden z-40 flex flex-col">
+  <div class="flex justify-end p-4">
+    <button id="close-overlay" class="text-white text-3xl font-bold">×</button>
+  </div>
+  <div class="flex-grow overflow-auto p-6">
+    <div class="episode-grid-wrapper overflow-x-auto">
+      <div class="episode-grid" id="mobileEpisodeGrid"></div>
+    </div>
   </div>
 </div>
 
@@ -451,6 +486,38 @@ function buildGrid() {
     }
   }
 }
+
+// Mobile Grid
+const mobileGrid = document.getElementById("mobileEpisodeGrid");
+
+function buildMobileGrid() {
+  mobileGrid.innerHTML = "";
+  for (let ep = 1; ep <= 25; ep++) {
+    for (let season = 1; season <= 10; season++) {
+      const episodeExists = episodes.some(e => e.season === season && e.episode === ep);
+      const cell = document.createElement("div");
+      cell.className = "episode-cell";
+      if (episodeExists) {
+        cell.id = `m-s${season}e${ep}`;
+        cell.textContent = `S${season}E${ep}`;
+      } else {
+        cell.style.visibility = "hidden";
+      }
+      mobileGrid.appendChild(cell);
+    }
+  }
+}
+
+// Show overlay
+document.getElementById("mobile-grid-btn").onclick = () => {
+  buildMobileGrid();
+  document.getElementById("grid-overlay").classList.remove("hidden");
+};
+
+// Close overlay
+document.getElementById("close-overlay").onclick = () => {
+  document.getElementById("grid-overlay").classList.add("hidden");
+};
 
 function updateStats() {
   document.getElementById("score").innerText = correct;
