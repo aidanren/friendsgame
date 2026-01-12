@@ -1,155 +1,168 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Friends Episode Guessing Game</title>
-
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#eab308",
+        "background-light": "#f8fafc",
+        "background-dark": "#0f172a",
+        "panel-dark": "#1e293b",
+        correct: "#10b981",
+        incorrect: "#ef4444"
+      },
+      fontFamily: {
+        display: ["Montserrat", "sans-serif"],
+        marker: ["Permanent Marker", "cursive"]
+      },
+      borderRadius: {
+        DEFAULT: "0.75rem"
+      }
+    }
+  }
+};
+</script>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background-color: #0a0a0a;
-  color: #ffffff;
-  margin: 0;
-  padding: 30px 0;
-  display: flex;
-  justify-content: center;
+.glow-border {
+  box-shadow: 0 0 15px rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 10px;
 }
 
-p {
-    font-size: 20px;
-}
-
-.page {
-  max-width: 1300px;
-  width: 100%;
-  display: flex;
-  gap: 40px;
-}
-
-.game-container,
-.graph-container {
-  background: #1a1a1a;
-  padding: 25px 35px;
-  border-radius: 15px;
-  box-shadow: 0 0 20px #e6c200;
-}
-
-.game-container {
-  width: 430px;
-  text-align: center;
-}
-
-.graph-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-img {
-  width: 280px;
-  margin-bottom: 15px;
-}
-
-h1 {
-  color: #51B6FB;
-}
-
-input {
-  padding: 8px;
-  margin: 10px;
-  width: 60px;
-  border-radius: 5px;
-  border: 2px solid #e6c200;
-  background-color: #0a0a0a;
-  color: #e6c200;
-  font-weight: bold;
-}
-
-button {
-  padding: 10px 20px;
-  border: 2px solid #51B6FB;
-  border-radius: 5px;
-  background: #0a0a0a;
-  color: #51B6FB;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.feedback {
-  margin-top: 15px;
-  font-size: 18px;
-  min-height: 28px;
-}
-
-.status {
-  margin-top: 8px;
-}
-
+/* Episode Grid */
 .episode-grid {
   display: grid;
-  grid-template-columns: repeat(10, 70px);
-  gap: 10px;
+  grid-template-columns: repeat(10, 1fr); /* 10 seasons horizontally */
+  grid-template-rows: repeat(25, minmax(50px, 1fr)); /* 25 episodes vertically */
+  gap: 6px;
+  padding: 6px;
 }
 
 .episode-cell {
-  width: 70px;
-  height: 40px;
-  background: #2b2b2b;
-  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  color: #ccc;
+  text-align: center;
+  padding: 8px;
+  border-radius: 0.75rem;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-weight: 700;
+  cursor: default;
+  transition: all 0.2s;
+  word-wrap: break-word;
+  white-space: normal;
+  min-width: 60px;
+  min-height: 50px; 
+  font-size: 0.875rem;
 }
 
-.correct {
-  background: #2ecc71;
-  color: #0a0a0a;
+
+.episode-cell.correct {
+  background-color: #10b981;
+  color: white;
 }
 
-.incorrect {
-  background: #c0392b;
+.episode-cell.incorrect {
+  background-color: #ef4444;
+  color: white;
 }
 </style>
 </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display transition-colors duration-300">
 
-<body>
+<div class="container mx-auto p-4 lg:p-8 h-screen flex flex-col">
+  <div class="flex flex-col lg:flex-row gap-6 h-full overflow-hidden">
 
-<div class="page">
+    <!-- Sidebar/Game Panel -->
+    <aside class="w-full lg:w-1/3 xl:w-1/4 flex flex-col gap-6">
+      <div class="bg-white dark:bg-panel-dark p-8 rounded-2xl glow-border flex flex-col items-center text-center h-full">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Friends_Logo_White.png" class="w-52 mb-4">
+        <h1 class="text-4xl md:text-5xl font-black tracking-widest mb-2 text-primary">Episode Guessing Game</h1>
+        <p id="episode-title" class="text-xl font-marker mb-6"></p>
 
-  <div class="game-container">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Friends_logo.svg">
-    <h1>Episode Guessing Game</h1>
+        <div class="w-full grid grid-cols-2 gap-4 mb-4">
+          <div class="space-y-2">
+            <label class="text-xs uppercase font-bold opacity-60 block text-left">Season</label>
+            <input type="number" id="season-input" min="1" class="w-full bg-slate-100 dark:bg-slate-800 border-1px rounded-xl text-center py-3 text-xl font-bold focus:ring-2 focus:ring-primary">
+          </div>
+          <div class="space-y-2">
+            <label class="text-xs uppercase font-bold opacity-60 block text-left">Episode</label>
+            <input type="number" id="episode-input" min="1" class="w-full bg-slate-100 dark:bg-slate-800 border-1px rounded-xl text-center py-3 text-xl font-bold focus:ring-2 focus:ring-primary">
+          </div>
+        </div>
 
-    <p id="episode-title"></p>
+        <div class="flex flex-col gap-3 w-full mb-4">
+          <button id="submit-btn" class="w-full bg-primary hover:bg-yellow-500 text-slate-900 font-bold py-4 rounded-xl shadow-lg shadow-yellow-500/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+            <span class="material-icons">send</span> Submit
+          </button>
+          <button id="restart-btn" class="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 font-bold py-3 rounded-xl transition-all active:scale-95 text-sm">
+            Restart
+          </button>
+        </div>
 
-    <label>Season <input type="number" id="season-input" min="1"></label>
-    <label>Episode <input type="number" id="episode-input" min="1"></label>
+        <p class="feedback text-lg font-bold mb-2" id="feedback"></p>
+        <div class="w-full grid grid-cols-2 gap-4 text-sm">
+          <div class="bg-correct/10 p-3 rounded-lg text-center">
+            <span class="block text-[10px] uppercase font-bold text-correct mb-1">Correct</span>
+            <span class="text-xl font-black text-correct" id="score">0</span>
+          </div>
+          <div class="bg-incorrect/10 p-3 rounded-lg text-center">
+            <span class="block text-[10px] uppercase font-bold text-incorrect mb-1">Incorrect</span>
+            <span class="text-xl font-black text-incorrect" id="incorrect-score">0</span>
+          </div>
+        </div>
+        <p class="text-xs mt-2">High Score: <span id="high-score">0</span></p>
+        <p class="text-xs">Last Played: <span id="last-played">-</span></p>
+      </div>
+    </aside>
 
-    <br>
+    <!-- Main Grid -->
+    <main class="flex-grow bg-white dark:bg-panel-dark rounded-2xl glow-border flex flex-col overflow-hidden">
+      <header class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+        <div class="flex items-center gap-4">
+          <span class="material-icons text-primary">grid_view</span>
+          <h3 class="font-bold uppercase tracking-widest text-sm">Episode Grid</h3>
+        </div>
+      </header>
+      <div class="p-6 overflow-y-auto custom-scrollbar flex-grow">
+        <div class="episode-grid" id="episodeGrid"></div>
+      </div>
+      <footer class="p-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-700 text-center text-[10px] opacity-40 font-bold uppercase tracking-widest">
+        Friends Episode Grid
+      </footer>
+    </main>
 
-    <button id="submit-btn">Submit Guess</button>
-    <button id="restart-btn">Restart</button>
-
-    <p class="feedback" id="feedback"></p>
-    <p class="status" id="score"></p>
-    <p class="status" id="high-score"></p>
-    <p class="status" id="last-played"></p>
   </div>
-
-  <div class="graph-container">
-    <div class="episode-grid" id="episodeGrid"></div>
-  </div>
-
 </div>
+
+<!-- Dark Mode Toggle -->
+<button class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-white dark:bg-panel-dark shadow-2xl flex items-center justify-center border border-slate-200 dark:border-slate-700 hover:scale-110 transition-transform" onclick="document.documentElement.classList.toggle('dark')">
+  <span class="material-icons dark:hidden text-slate-800">dark_mode</span>
+  <span class="material-icons hidden dark:block text-yellow-400">light_mode</span>
+</button>
 
 <script>
 const episodes = [
-  { title: "The One Where Monica Gets a Roommate", season: 1, episode: 1 },
+    { title: "The One Where Monica Gets a Roommate", season: 1, episode: 1 },
   { title: "The One with the Sonogram at the End", season: 1, episode: 2 },
   { title: "The One with the Thumb", season: 1, episode: 3 },
   { title: "The One with George Stephanopoulos", season: 1, episode: 4 },
@@ -406,38 +419,34 @@ const feedback = document.getElementById("feedback");
 
 function buildGrid() {
   grid.innerHTML = "";
-  for (let ep = 1; ep <= 25; ep++) {
-    for (let season = 1; season <= 10; season++) {
-      const exists = episodes.some(e => e.season === season && e.episode === ep);
-      if (exists) {
-        const cell = document.createElement("div");
-        cell.className = "episode-cell";
+  for (let ep = 1; ep <= 25; ep++) {            // Episodes top to bottom
+    for (let season = 1; season <= 10; season++) { // Seasons left to right
+      const episodeExists = episodes.some(e => e.season === season && e.episode === ep);
+      const cell = document.createElement("div");
+      cell.className = "episode-cell";
+      if (episodeExists) {
         cell.id = `s${season}e${ep}`;
         cell.textContent = `S${season}E${ep}`;
-        grid.appendChild(cell);
       } else {
-        const spacer = document.createElement("div");
-        spacer.style.visibility = "hidden";
-        grid.appendChild(spacer);
+        cell.style.visibility = "hidden";
       }
+      grid.appendChild(cell);
     }
   }
 }
 
+
 function updateStats() {
-  document.getElementById("score").innerText =
-    `Correct: ${correct} | Incorrect: ${incorrect}`;
+  document.getElementById("score").innerText = correct;
+  document.getElementById("incorrect-score").innerText = incorrect;
 
   const high = Number(localStorage.getItem("friendsHighScore") || 0);
   if (correct > high) localStorage.setItem("friendsHighScore", correct);
 
-  document.getElementById("high-score").innerText =
-    `High Score: ${localStorage.getItem("friendsHighScore")}`;
-
+  document.getElementById("high-score").innerText = localStorage.getItem("friendsHighScore");
   const today = new Date().toLocaleDateString();
   localStorage.setItem("friendsLastPlayed", today);
-  document.getElementById("last-played").innerText =
-    `Last Played: ${today}`;
+  document.getElementById("last-played").innerText = today;
 }
 
 function nextEpisode() {
@@ -449,10 +458,8 @@ function nextEpisode() {
 
   const index = Math.floor(Math.random() * remainingEpisodes.length);
   currentEpisode = remainingEpisodes.splice(index, 1)[0];
+  document.getElementById("episode-title").innerText = `"${currentEpisode.title}"`;
 
-  document.getElementById("episode-title").innerText =
-    `"${currentEpisode.title}"`;
-  
   document.getElementById("season-input").value = "";
   document.getElementById("episode-input").value = "";
 }
@@ -472,12 +479,15 @@ document.getElementById("submit-btn").onclick = () => {
   } else {
     incorrect++;
     if (correctCell) correctCell.classList.add("incorrect");
-    feedback.innerText =
-      `Incorrect. Season ${currentEpisode.season} Episode ${currentEpisode.episode}`;
+    feedback.innerText = `Incorrect. Season ${currentEpisode.season} Episode ${currentEpisode.episode}`;
   }
 
   updateStats();
-  setTimeout(nextEpisode, 1500);
+
+  // Wait 2 seconds before moving to the next episode
+  setTimeout(() => {
+    nextEpisode();
+  }, 2000);
 };
 
 document.getElementById("restart-btn").onclick = () => {
@@ -489,11 +499,12 @@ document.getElementById("restart-btn").onclick = () => {
   nextEpisode();
 };
 
-buildGrid();
-remainingEpisodes = [...episodes];
-updateStats();
-nextEpisode();
+window.onload = () => {
+  remainingEpisodes = [...episodes];
+  buildGrid();
+  updateStats();
+  nextEpisode();
+};
 </script>
-
 </body>
 </html>
